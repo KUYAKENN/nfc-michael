@@ -327,7 +327,7 @@
                     <div class="profile-address">{{ contact.address }}</div>
                 </div>
                 <div class="profile-image-container">
-                    <img src="/static/profile.png" alt="{{ contact.full_name }}" class="profile-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <img src="/static/profile.png" alt="Profile Image" class="profile-image" onerror="this.style.display='none';">
                     <div class="profile-initials">QS</div>
                 </div>
             </div>
@@ -368,20 +368,18 @@
                 </div>
                 {% endif %}
 
-                {% if contact.website %}
                 <!-- Website -->
                 <div class="contact-item">
                     <div class="contact-icon">
                         🌐
                     </div>
                     <div class="contact-details">
-                        <div class="contact-label">Company</div>
+                        <div class="contact-label">Website</div>
                         <div class="contact-value">
-                            <a href="{{ contact.website }}" target="_blank">{{ contact.website }}</a>
+                            <a href="https://quanbyit.com" target="_blank">https://quanbyit.com</a>
                         </div>
                     </div>
                 </div>
-                {% endif %}
             </div>
         </div>
 
