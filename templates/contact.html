@@ -416,29 +416,7 @@
 
     <script>
         async function addToContacts() {
-            // Try modern Contact Picker API first (if supported)
-            if ('contacts' in navigator && 'ContactsManager' in window) {
-                try {
-                    // This is experimental and requires user permission
-                    const contact = {
-                        name: ['{{ contact.full_name }}'],
-                        tel: ['{{ contact.phone_number }}'],
-                        email: ['{{ contact.email }}'],
-                        organization: ['{{ contact.company }}'],
-                        jobTitle: ['{{ contact.title }}'],
-                        address: ['{{ contact.address }}']
-                    };
-                    
-                    // Try to add contact directly
-                    await navigator.contacts.select(['name', 'tel', 'email', 'address'], { multiple: false });
-                    alert('Contact added successfully!');
-                    return;
-                } catch (error) {
-                    console.log('Contact API not supported:', error);
-                }
-            }
-            
-            // For mobile devices - try to trigger automatic download and opening
+            // For mobile devices - trigger automatic download and opening
             if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
                 // Mobile: Automatically download and try to open
                 const downloadUrl = '/nfc/michael/vcard';
@@ -457,7 +435,7 @@
                 return;
             }
             
-            // Desktop fallback: Download vCard file
+            // Desktop: Download vCard file
             const downloadUrl = '/nfc/michael/vcard';
             
             // Create temporary link and trigger download
@@ -491,7 +469,7 @@
                 max-width: 90%;
                 text-align: center;
             `;
-            message.innerHTML = '📱 Contact file downloaded!<br>Tap the file to automatically add to your contacts.';
+            message.innerHTML = '📱 Contact downloaded!<br>Tap the downloaded file to save to your contacts app.';
             
             document.body.appendChild(message);
             
@@ -520,7 +498,7 @@
                 font-family: inherit;
                 font-size: 14px;
             `;
-            message.textContent = '💾 Contact file downloaded! Open the .vcf file to add to your contacts.';
+            message.textContent = '💾 Contact downloaded! Open the Michael_Anthony_Maxwell.vcf file to save to your contacts.';
             
             document.body.appendChild(message);
             
