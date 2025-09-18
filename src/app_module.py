@@ -32,7 +32,7 @@ app = PyNestFactory.create(
 http_server = app.get_server()
 
 app = FastAPI()
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory="nfc-michael/static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 @app.get("/nfc/michael/", response_class=HTMLResponse)
