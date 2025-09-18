@@ -12,6 +12,10 @@ app.mount("/nfc-michael/static", StaticFiles(directory="static"), name="static")
 def favicon():
     return FileResponse("static/favicon.ico")
 
+@app.get("/nfc/michael/")
+def get_michael():
+    return {"detail": "Michael route is working"}
+
 if __name__ == '__main__':
     uvicorn.run(
         'src.app_module:app',  # Correctly reference the FastAPI instance
