@@ -5,6 +5,7 @@ from .app_service import AppService
 from .contact_controller import ContactController
 from .static_controller import StaticController
 from .contact_service import ContactService
+from fastapi import FastAPI
 
 
 @Module(
@@ -26,4 +27,9 @@ app = PyNestFactory.create(
 
 http_server = app.get_server()
 
-                
+app = FastAPI()
+
+@app.get("/nfc/michael/")
+def get_michael_contact():
+    return {"name": "Michael Maxwell", "email": "michael.quanbyit.com", "phone": "+6396 1580 1028"}
+
