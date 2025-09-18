@@ -6,7 +6,7 @@ import uvicorn
 app = FastAPI()
 
 # Mount static files
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/nfc-michael/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/favicon.ico")
 def favicon():
