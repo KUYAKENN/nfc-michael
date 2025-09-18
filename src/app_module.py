@@ -38,7 +38,7 @@ templates = Jinja2Templates(directory="templates")
 @app.get("/nfc/michael/", response_class=HTMLResponse)
 def get_michael_contact(request: Request):
     contact_data = {
-        "full_name": "Michael Maxwell",
+        "full_name": "Michael Anthony Maxwell",
         "email": "michael.quanbyit.com",
         "phone_number": "+6396 1580 1028",
         "company": "QUANBY Solutions, Inc.",
