@@ -6,6 +6,9 @@ from .contact_controller import ContactController
 from .static_controller import StaticController
 from .contact_service import ContactService
 from fastapi import FastAPI
+from fastapi.templating import Jinja2Templates
+from fastapi.requests import Request
+from fastapi.responses import HTMLResponse
 
 
 @Module(
@@ -28,8 +31,18 @@ app = PyNestFactory.create(
 http_server = app.get_server()
 
 app = FastAPI()
+templates = Jinja2Templates(directory="templates")
 
-@app.get("/nfc/michael/")
-def get_michael_contact():
-    return {"name": "Michael Maxwell", "email": "michael.quanbyit.com", "phone": "+6396 1580 1028"}
+@app.get("/nfc/michael/", response_class=HTMLResponse)
+def get_michael_contact(request: Request):
+    contact_data = {
+        "full_name": "Michael Maxwell",
+        "email": "michael.quanbyit.com",
+        "phone_number": "+6396 1580 1028",
+        "company": "QUANBY Solutions, Inc.",
+        "title": "Chief Technology Officer",
+        "address": "1862-B Dominga Street Pasay City",
+        "base_url": "https://recognitionbe.quanbyit.com"
+    }
+    return templates.TemplateResponse("contact.html", {"request": request, "contact": contact_data})
 
