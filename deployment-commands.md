@@ -39,5 +39,5 @@ curl http://localhost:5002/nfc/contact
 # Should return HTML content
 
 # 10. Test from outside
-curl https://recognitionbe.quanbyit.com/nfc/contact
+curl https://recognitionbe.quanbyit.com/nfc/michael
 # Should return the contact page
