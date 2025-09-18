@@ -386,8 +386,21 @@
         <!-- Action Buttons -->
         <div class="actions">
             <button onclick="addToContacts()" class="btn btn-primary">
-                <span class="btn-icon">+</span> Add to Contacts
+                <span class="btn-icon">📱</span> Save to Contacts
             </button>
+            <button onclick="showQRCode()" class="btn btn-secondary" style="margin-top: 10px;">
+                <span class="btn-icon">📷</span> Scan QR to Add Contact
+            </button>
+        </div>
+
+        <!-- QR Code Modal -->
+        <div id="qrModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;">
+            <div style="background: white; padding: 30px; border-radius: 15px; text-align: center; max-width: 90%; position: relative;">
+                <h3 style="margin-bottom: 20px; color: #1a4b73;">Scan QR Code to Add Contact</h3>
+                <div id="qrcode" style="margin: 20px auto;"></div>
+                <p style="margin: 15px 0; color: #666; font-size: 14px;">Open your phone camera and point it at the QR code.<br>Tap the notification to add contact directly!</p>
+                <button onclick="closeQRCode()" style="background: #1a4b73; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Close</button>
+            </div>
         </div>
 
         <!-- Logo Section -->
@@ -408,35 +421,86 @@
                 try {
                     // This is experimental and requires user permission
                     const contact = {
-                        name: '{{ contact.full_name }}',
-                        tel: '{{ contact.phone_number }}',
-                        email: '{{ contact.email }}',
-                        organization: '{{ contact.company }}',
-                        title: '{{ contact.title }}',
-                        address: '{{ contact.address }}'
+                        name: ['{{ contact.full_name }}'],
+                        tel: ['{{ contact.phone_number }}'],
+                        email: ['{{ contact.email }}'],
+                        organization: ['{{ contact.company }}'],
+                        jobTitle: ['{{ contact.title }}'],
+                        address: ['{{ contact.address }}']
                     };
                     
-                    // Note: This API is still experimental and limited
-                    alert('Contact information copied. Please save manually in your contacts app.');
+                    // Try to add contact directly
+                    await navigator.contacts.select(['name', 'tel', 'email', 'address'], { multiple: false });
+                    alert('Contact added successfully!');
                     return;
                 } catch (error) {
                     console.log('Contact API not supported:', error);
                 }
             }
             
-            // Fallback: Download vCard file
+            // For mobile devices - try to trigger automatic download and opening
+            if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                // Mobile: Automatically download and try to open
+                const downloadUrl = '/nfc/michael/vcard';
+                
+                // Create and trigger download
+                const link = document.createElement('a');
+                link.href = downloadUrl;
+                link.download = 'Michael_Anthony_Maxwell.vcf';
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // Show mobile-specific message
+                showMobileContactMessage();
+                return;
+            }
+            
+            // Desktop fallback: Download vCard file
             const downloadUrl = '/nfc/michael/vcard';
             
             // Create temporary link and trigger download
             const link = document.createElement('a');
             link.href = downloadUrl;
-            link.download = '{{ contact.full_name }}_contact.vcf';
+            link.download = 'Michael_Anthony_Maxwell.vcf';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
             
             // Show user-friendly message
             showContactMessage();
+        }
+        
+        function showMobileContactMessage() {
+            // Create and show a mobile-optimized message
+            const message = document.createElement('div');
+            message.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #1a4b73;
+                color: white;
+                padding: 15px 25px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 1000;
+                font-family: inherit;
+                font-size: 14px;
+                max-width: 90%;
+                text-align: center;
+            `;
+            message.innerHTML = '📱 Contact file downloaded!<br>Tap the file to automatically add to your contacts.';
+            
+            document.body.appendChild(message);
+            
+            // Remove message after 5 seconds (longer for mobile)
+            setTimeout(() => {
+                if (message.parentNode) {
+                    message.parentNode.removeChild(message);
+                }
+            }, 5000);
         }
         
         function showContactMessage() {
@@ -456,7 +520,7 @@
                 font-family: inherit;
                 font-size: 14px;
             `;
-            message.textContent = 'Contact file downloaded! Open it to add to your contacts.';
+            message.textContent = '💾 Contact file downloaded! Open the .vcf file to add to your contacts.';
             
             document.body.appendChild(message);
             
@@ -467,6 +531,53 @@
                 }
             }, 3000);
         }
+        
+        function showQRCode() {
+            // Create vCard content for QR code
+            const vCardData = `BEGIN:VCARD
+VERSION:3.0
+FN:{{ contact.full_name }}
+TEL:{{ contact.phone_number }}
+EMAIL:{{ contact.email }}
+ORG:{{ contact.company }}
+TITLE:{{ contact.title }}
+ADR:;;{{ contact.address }};;;;
+END:VCARD`;
+
+            // Clear any existing QR code
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = '';
+            
+            // Generate QR code using a simple QR API
+            const qrSize = 200;
+            const qrURL = `https://api.qrserver.com/v1/create-qr-code/?size=${qrSize}x${qrSize}&data=${encodeURIComponent(vCardData)}`;
+            
+            const qrImg = document.createElement('img');
+            qrImg.src = qrURL;
+            qrImg.style.width = qrSize + 'px';
+            qrImg.style.height = qrSize + 'px';
+            qrImg.style.border = '2px solid #ddd';
+            qrImg.style.borderRadius = '8px';
+            
+            qrContainer.appendChild(qrImg);
+            
+            // Show the modal
+            const modal = document.getElementById('qrModal');
+            modal.style.display = 'flex';
+        }
+        
+        function closeQRCode() {
+            const modal = document.getElementById('qrModal');
+            modal.style.display = 'none';
+        }
+        
+        // Close modal when clicking outside
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('qrModal');
+            if (event.target === modal) {
+                closeQRCode();
+            }
+        });
     </script>
 </body>
 </html>
