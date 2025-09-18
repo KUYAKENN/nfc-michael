@@ -8,7 +8,7 @@ from .contact_service import ContactService
 from fastapi import FastAPI
 from fastapi.templating import Jinja2Templates
 from fastapi.requests import Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 
 
@@ -34,6 +34,10 @@ http_server = app.get_server()
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
+
+@app.get("/favicon.ico")
+def favicon():
+    return FileResponse("static/logo.png")  # Use logo.png as favicon since favicon.ico doesn't exist
 
 @app.get("/nfc/michael/", response_class=HTMLResponse)
 def get_michael_contact(request: Request):
